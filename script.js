@@ -3,6 +3,8 @@ let tasks = [];
 let nextId = 1;
 // 編集中のタスクID（編集中でなければ null）
 let editingId = null;
+// 編集中の入力内容（再描画しても入力途中の文字が消えないよう状態として保持する）
+let editingText = '';
 
 const taskInput = document.getElementById('task-input');
 const taskForm = document.querySelector('.task-form');
@@ -29,19 +31,22 @@ function toggleTask(id) {
 }
 
 function startEdit(id) {
+  const task = tasks.find((t) => t.id === id);
   editingId = id;
+  editingText = task.text;
   render();
 }
 
 // Update：編集フォームの内容で更新する
-function saveEdit(id, newText) {
-  const text = newText.trim();
+function saveEdit(id) {
+  const text = editingText.trim();
   if (text === '') {
     return;
   }
   const task = tasks.find((t) => t.id === id);
   task.text = text;
   editingId = null;
+  editingText = '';
   render();
 }
 
@@ -53,6 +58,7 @@ function deleteTask(id) {
   tasks = tasks.filter((t) => t.id !== id);
   if (editingId === id) {
     editingId = null;
+    editingText = '';
   }
   render();
 }
@@ -78,9 +84,12 @@ function createTaskItem(task) {
   if (task.id === editingId) {
     const editInput = document.createElement('input');
     editInput.type = 'text';
-    editInput.value = task.text;
+    editInput.value = editingText;
+    editInput.addEventListener('input', () => {
+      editingText = editInput.value;
+    });
     li.appendChild(editInput);
-    li.appendChild(createButton('保存', () => saveEdit(task.id, editInput.value)));
+    li.appendChild(createButton('保存', () => saveEdit(task.id)));
   } else {
     const span = document.createElement('span');
     span.className = 'task-text';

@@ -5,12 +5,14 @@ let nextId = 1;
 let editingId = null;
 
 const taskInput = document.getElementById('task-input');
-const saveButton = document.getElementById('save-button');
+const taskForm = document.querySelector('.task-form');
 const taskList = document.getElementById('task-list');
 const counts = document.getElementById('counts');
 
-// Create：入力内容をタスクとして追加する
-saveButton.addEventListener('click', () => {
+// Create：入力内容をタスクとして追加する（ボタンのクリックと Enter キーのどちらでも submit される）
+taskForm.addEventListener('submit', (event) => {
+  // フォーム送信によるページの再読み込みを防ぐ
+  event.preventDefault();
   const text = taskInput.value.trim();
   if (text === '') {
     return;
